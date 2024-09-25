@@ -10,7 +10,7 @@ Welcome to **CPHints**, a platform designed for coding enthusiasts to share, dis
 - [Setup and Installation](#setup-and-installation)
 - [API Endpoints](#api-endpoints)
 - [Contributing](#contributing)
-- [License](#license)
+
 
 ## Project Overview
 
@@ -123,11 +123,6 @@ Contributions are welcome! If you want to contribute, please follow these steps:
 4. Push to the branch (`git push origin feature/your-feature-name`).
 5. Open a Pull Request.
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
----
 
 ### Useful Links
 - **Live Website**: [https://cphints.com](https://cphints.com) 
