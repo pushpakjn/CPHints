@@ -1,6 +1,6 @@
 # CPHints
 
-Welcome to **CPHints**, a platform designed for coding enthusiasts to share, discover, and upvote high-quality coding hints and tips. The platform supports 6 popular coding platforms, including **Codeforces** and **Leetcode**, helping users improve their performance by upto 25% and achieve higher ranks.
+Welcome to **CPHints**, a platform designed for coding enthusiasts to share, discover, and upvote high-quality coding hints and tips. The platform supports 6 popular coding platforms, including **Codeforces** and **Leetcode**, helping users improve their performance by up to 25% and achieve higher ranks.
 
 ## Table of Contents
 
