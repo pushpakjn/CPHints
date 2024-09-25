@@ -1,7 +1,3 @@
-Here’s a professional `README.md` template for your GitHub repository to describe the **CPHints** project:
-
----
-
 # CPHints
 
 Welcome to **CPHints**, a platform designed for coding enthusiasts to share, discover, and upvote high-quality coding hints and tips. The platform supports 6 popular coding platforms, including **Codeforces** and **Leetcode**, helping users improve their performance by up to 25% and achieve higher ranks.
