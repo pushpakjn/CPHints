@@ -130,4 +130,3 @@ Contributions are welcome! If you want to contribute, please follow these steps:
 
 ---
 
-Feel free to modify the content as necessary based on the actual structure and goals of your project.
