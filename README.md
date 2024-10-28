@@ -75,15 +75,19 @@ Welcome to **CPHints**, a platform designed for coding enthusiasts to share, dis
    **Backend `.env`:**
    ```env
    PORT=5000
-   DATABASE_URL=your_postgresql_url
-   REDIS_URL=your_redis_url
-   JWT_SECRET=your_jwt_secret
+   DB_HOST=cphints.aivencloud.com
+   DB_PORT=17977
+   DB_USER=avnadmin
+   DB_PASSWORD=your_db_password
    SENDGRID_API_KEY=your_sendgrid_api_key
-   ```
-
-   **Frontend `.env`:**
-   ```env
-   REACT_APP_API_URL=http://localhost:5000/api
+   SENDGRID_EMAIL=example@gmail.com
+   REDIS_HOST=your_redis_host
+   REDIS_PASSWORD=your_redis_password
+   PSQL_STRING=your_psql_connection_string
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_API_KEY=your_supabase_api_key
+   ADMIN_EMAIL=example@gmail.com
+   JWT_SECRET=your_jwt_secret
    ```
 
 5. **Run the development server**:
