@@ -125,7 +125,7 @@ Contributions are welcome! If you want to contribute, please follow these steps:
 
 
 ### Useful Links
-- **Live Website**: [https://cphints.com](https://cphints.com) 
+
 - **Report Issues**: [https://github.com/yourusername/cphints/issues](https://github.com/pushpakjn/cphints/issues)
 
 ---
