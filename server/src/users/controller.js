@@ -46,7 +46,9 @@ export const addUser = async (request, response) => {
           response.status(200).json({ otp });
         })
         .catch((error) => {
-          response.status(401).send("OTP error", error);
+          // response.status(401).send("OTP error", error);
+          response.status(401).json({ message: "OTP error", error });
+
         });
     }
   } catch (error) {

@@ -3,7 +3,8 @@ import { Col, Row, Toast } from "react-bootstrap";
 import Img from "react-bootstrap/Image";
 import code_editor from "../../assets/images/code_editor.png";
 import { Container, Stack } from "react-bootstrap";
-import Typist from "react-typist";
+// import Typist from "react-typist";
+import { TypeAnimation } from "react-type-animation";
 import { InputGroup, Button, Form } from "react-bootstrap";
 import "react-multi-carousel/lib/styles.css";
 import NavBar from "../../components/Navbar";
@@ -56,9 +57,22 @@ const Landing = () => {
 
           <Container style={{ marginTop: "5%" }}>
             <div>
-              <Typist>
+              {/* <Typist>
                 <h1 className="main-heading text-white">Stuck on a problem?</h1>
-              </Typist>
+              </Typist> */}
+              <br></br>
+              <TypeAnimation
+  sequence={[
+    'Stuck on a problem?',
+    1000, 
+  ]}
+  wrapper="h1"
+  className="main-heading text-white"
+  speed={50}
+  repeat={0} // This makes it type only once
+/>
+<br></br>
+<br></br>
               <InputGroup className="search-bar mb-5 " size="lg">
                 <Form.Control
                   placeholder="Enter problem name or link"

@@ -5,27 +5,70 @@ import Redis from "ioredis";
 import { redisClient } from "../../server.js";
 dotenv.config();
 
-export const addTemporaryHint = async (request, response) => {
-  const { qlink, hints } = request.body;
+// export const addTemporaryHint = async (request, response) => {
+//   const { qlink, hints } = request.body;
 
-  // Pad hints array with null if length is less than 5
-  while (hints.length < 5) {
-    hints.push(null);
-  }
+//   // Pad hints array with null if length is less than 5
+//   while (hints.length < 5) {
+//     hints.push(null);
+//   }
 
+//   try {
+//     const results = await pool.query(queries.addTemporaryHint, [
+//       ...hints,
+//       qlink,
+//       request.user.id,
+//     ]);
+
+//     response.status(201).json(results.rows[0]);
+//   } catch (err) {
+//     console.log("Error adding hint:", err);
+//     response.status(400).json({ message: "Error adding hint." });
+//   }
+// };
+export const addTemporaryHint = async (req, res) => {
   try {
-    const results = await pool.query(queries.addTemporaryHint, [
-      ...hints,
-      qlink,
-      request.user.id,
-    ]);
+    const { qlink, hints } = req.body;
+    const uid = req.user.id;
 
-    response.status(201).json(results.rows[0]);
+    // Normalize hints (ensure 5 items)
+    while (hints.length < 5) hints.push(null);
+
+    // 1️⃣ Detect platform
+    let platform = 'unknown';
+    if (qlink.includes("leetcode.com")) platform = "leetcode";
+    else if (qlink.includes("codeforces.com")) platform = "codeforces";
+    else if (qlink.includes("geeksforgeeks.org")) platform = "gfg";
+
+    // 2️⃣ Extract question name from URL
+    const parts = qlink.split("/");
+    const qname = parts[parts.length - 2] || "Unknown";
+
+    // 3️⃣ Insert into QUESTION TABLE
+    const questionResult = await pool.query(
+      `INSERT INTO question (qlink1, qlink2, platform, qname)
+       VALUES ($1, $2, $3, $4)
+       RETURNING qid`,
+      [qlink, qlink, platform, qname]
+    );
+
+    const qid = questionResult.rows[0].qid;
+
+    // 4️⃣ Insert into TEMPHINT TABLE
+    const hintResult = await pool.query(
+      `INSERT INTO temphint (hints, uid, qlink, qid)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [hints, uid, qlink, qid]
+    );
+
+    res.status(201).json(hintResult.rows[0]);
   } catch (err) {
-    console.log("Error adding hint:", err);
-    response.status(400).json({ message: "Error adding hint." });
+    console.error("Error adding hint:", err);
+    res.status(400).json({ message: "Error adding hint." });
   }
 };
+
 
 export const upDownvoteHint = async (request, response) => {
   const { upvote, downvote, hintId } = request.body;

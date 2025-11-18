@@ -1,11 +1,43 @@
-CREATE TABLE temphint(thid SERIAL PRIMARY KEY, hints TEXT[], upvote INTEGER, downvote INTEGER,uid INTEGER, qid INTEGER, qlink VARCHAR(255), FOREIGN KEY (uid) REFERENCES users(id), FOREIGN KEY (qid) REFERENCES question(qid));
+/* This is the single, fixed SQL file. 
+  It cleans up old tables and creates the new, correct tables.
+  Run this one file to fix your database.
+*/
 
-CREATE TABLE question (qid SERIAL PRIMARY KEY, qlink1 VARCHAR(255),qlink2 VARCHAR(255), platform VARCHAR(255), qname VARCHAR(255));
+-- STEP 1: Clean up any old tables (Drops them in the correct order)
+-- We use "IF EXISTS" so this command never fails.
 
-CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR(255), email VARCHAR(255), password VARCHAR(512), handle VARCHAR(255), color VARCHAR(25), username VARCHAR(255));
+-- DROP TABLE IF EXISTS temphint;
+-- DROP TABLE IF EXISTS hint;
+-- DROP TABLE IF EXISTS users;
+-- DROP TABLE IF EXISTS question;
 
-CREATE TABLE hint(hid SERIAL PRIMARY KEY, hints TEXT[], upvote INTEGER, downvote INTEGER,uid INTEGER, qid INTEGER, FOREIGN KEY (uid) REFERENCES users(id), FOREIGN KEY (qid) REFERENCES question(qid));
 
+-- STEP 2: Create the tables in the correct order (Parents first)
+
+-- Create 'users' table (no dependencies)
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY, 
+  name VARCHAR(255) NOT NULL CHECK (name <> ''), 
+  email VARCHAR(255) NOT NULL CHECK (email <> ''), 
+  password VARCHAR(512) NOT NULL CHECK (password <> ''), 
+  username VARCHAR(255) NOT NULL CHECK (username <> ''),
+  handle VARCHAR(255),
+  color VARCHAR(25)
+);
+
+-- Create 'question' table (no dependencies)
+CREATE TABLE question (
+  qid SERIAL PRIMARY KEY, 
+  qlink1 VARCHAR(255) NOT NULL CHECK (qlink1 <> ''), 
+  qlink2 VARCHAR(255) NOT NULL, 
+  platform VARCHAR(255) NOT NULL CHECK (platform <> ''), 
+  qname VARCHAR(255) NOT NULL CHECK (qname <> '')
+);
+
+
+-- STEP 3: Create the 'child' tables that depend on 'users' and 'question'
+
+-- Create 'hint' table
 CREATE TABLE hint(
   hid SERIAL PRIMARY KEY, 
   hints TEXT[] CHECK (
@@ -20,6 +52,8 @@ CREATE TABLE hint(
   FOREIGN KEY (uid) REFERENCES users(id), 
   FOREIGN KEY (qid) REFERENCES question(qid)
 );
+
+-- Create 'temphint' table (with the missing 'qid' column added)
 CREATE TABLE temphint(
   thid SERIAL PRIMARY KEY, 
   hints TEXT[] CHECK (
@@ -29,21 +63,7 @@ CREATE TABLE temphint(
   ), 
   uid INTEGER NOT NULL, 
   qlink VARCHAR(255) NOT NULL CHECK (qlink <> ''), 
-  FOREIGN KEY (uid) REFERENCES users(id), 
+  qid INTEGER NULL, -- <-- This was the missing bug
+  FOREIGN KEY (uid) REFERENCES users(id),
   FOREIGN KEY (qid) REFERENCES question(qid)
 );
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY, 
-  name VARCHAR(255) NOT NULL CHECK (name <> ''), 
-  email VARCHAR(255) NOT NULL CHECK (email <> ''), 
-  password VARCHAR(512) NOT NULL CHECK (password <> ''), 
-  username VARCHAR(255) NOT NULL CHECK (username <> '')
-);
-CREATE TABLE question (
-  qid SERIAL PRIMARY KEY, 
-  qlink1 VARCHAR(255) NOT NULL CHECK (qlink1 <> ''), 
-  qlink2 VARCHAR(255) NOT NULL, 
-  platform VARCHAR(255) NOT NULL CHECK (platform <> ''), 
-  qname VARCHAR(255) NOT NULL CHECK (qname <> '')
-);
-

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import NavBar from "../../components/Navbar";
 import { Container, Row, Dropdown, Button } from "react-bootstrap";
@@ -10,128 +10,135 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 
 const Hints = () => {
-  const { state } = useLocation();
+  const { state } = useLocation();   // contains qid, qname, platform, qlink1
+  const navigate = useNavigate();
 
-  const [arr, setArr] = useState([]);
+  const [hints, setHints] = useState([]); // all hints list
   const [sort, setSort] = useState("Latest Hints");
   const [limit, setLimit] = useState(12);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
+  // -------------------------
+  // Infinite Scroll
+  // -------------------------
   const handleInfiniteScroll = () => {
-    const scrollable =
-      document.documentElement.scrollHeight - window.innerHeight;
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
     const scrolled = window.scrollY;
-    if (Math.ceil(scrolled) === scrollable) {
+    if (Math.ceil(scrolled) >= scrollable) {
       setLimit((prev) => prev + 12);
     }
   };
 
   useEffect(() => {
     window.addEventListener("scroll", handleInfiniteScroll);
-    return () => {
-      window.removeEventListener("scroll", handleInfiniteScroll);
+    return () => window.removeEventListener("scroll", handleInfiniteScroll);
+  }, []);
 
-    }
-  }, [arr]);
-
+  // -------------------------
+  // Fetch hints on initial load + infinite scroll
+  // -------------------------
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchHints = async () => {
       try {
         const res = await Axios.post(`${BACKEND_URL}/hints/gethints/`, {
           qid: state.qid,
           limit: limit,
           offset: 0,
         });
+
         setIsLoading(false);
-        setArr(res.data);
+        setHints(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         toast.error("There was an error fetching the hints");
       }
     };
-    fetchData();
-  }, [limit]);
 
+    fetchHints();
+  }, [limit, state.qid]);
+
+  // -------------------------
+  // Fetch hints AFTER sort changes
+  // -------------------------
   useEffect(() => {
-    const fetchData = async () => {
-      const url = sort === "Latest Hints" ? "gethints" : "getHintsByVotes";
-      setLimit(12);
+    const fetchSortedHints = async () => {
+      const endpoint = sort === "Latest Hints" ? "gethints" : "getHintsByVotes";
 
-      const res = await Axios.post(`${BACKEND_URL}/hints/${url}/`, {
-        qid: state.qid,
-        limit: limit,
-        offset: 0,
-      });
-      setArr(res.data);
+      try {
+        const res = await Axios.post(`${BACKEND_URL}/hints/${endpoint}/`, {
+          qid: state.qid,
+          limit: 12,
+          offset: 0,
+        });
+
+        // Very important: Replace, do NOT append → avoids duplicates
+        setLimit(12);
+        setHints(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        toast.error("Error fetching sorted hints");
+      }
     };
-    fetchData();
-  }, [sort]);
+
+    fetchSortedHints();
+  }, [sort, state.qid]);
 
   return (
     <>
       <div style={{ backgroundColor: "#0F131A" }} className="min-vh-100">
         <NavBar bg="black" />
-        <div>
-          <Container>
-            <div className="my-3">
-              <a href={state.qlink1} target="__blank" id="link-title">
-                <h2>{state.qname}</h2>
-                <h4>{state.platform}</h4>
-              </a>
-            </div>
 
-            <div className="d-flex justify-content-end  my-4">
-              <div>
-                <Button
-                  variant="outline-primary-white"
-                  onClick={() =>
-                    navigate("/contribute", { state: { qlink: state.qlink1 } })
-                  }
+        <Container>
+          {/* Question Header */}
+          <div className="my-3">
+            <a href={state.qlink1} target="__blank" id="link-title">
+              <h2>{state.qname}</h2>
+              <h4>{state.platform}</h4>
+            </a>
+          </div>
+
+          {/* Buttons */}
+          <div className="d-flex justify-content-end my-4">
+            <Button
+              variant="outline-primary-white"
+              onClick={() => navigate("/contribute", { state: { qlink: state.qlink1 } })}
+            >
+              Add Hint
+            </Button>
+
+            <div style={{ width: "15%" }}>
+              <Dropdown>
+                <Dropdown.Toggle
+                  variant="transparent"
+                  id="dropdown-basic"
+                  className="text-primary-white border"
                 >
-                  Add Hint
-                </Button>
-              </div>
+                  {sort}
+                </Dropdown.Toggle>
 
-              <div className="" style={{ width: "15%" }}>
-                <Dropdown>
-                  <Dropdown.Toggle
-                    variant="transparent"
-                    id="dropdown-basic"
-                    className=" text-primary-white border"
-                  >
-                    {sort}
-                  </Dropdown.Toggle>
-
-                  <Dropdown.Menu>
-                    <Dropdown.Item
-                      href="#"
-                      onClick={() => setSort("Latest Hints")}
-                    >
-                      Latest Hints
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      href="#"
-                      onClick={() => setSort("Most Upvoted")}
-                    >
-                      Most Upvoted
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </div>
+                <Dropdown.Menu>
+                  <Dropdown.Item onClick={() => setSort("Latest Hints")}>
+                    Latest Hints
+                  </Dropdown.Item>
+                  <Dropdown.Item onClick={() => setSort("Most Upvoted")}>
+                    Most Upvoted
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
             </div>
-            <Row className="border-top border-dark">
-              {isLoading ? (
-                <LoadingComponent height="500px" lSize="30px" />
-              ) : (
-                arr &&
-                arr.map((a, i) => (
-                  <HintPanel bgColor="#1A1D24" key={i} hintData={a} />
-                ))
-              )}
-            </Row>
-          </Container>
-        </div>
+          </div>
+
+          {/* Hints List */}
+          <Row className="border-top border-dark">
+            {isLoading ? (
+              <LoadingComponent height="500px" lSize="30px" />
+            ) : (
+              hints.map((hint, idx) => (
+                <HintPanel bgColor="#1A1D24" key={idx} hintData={hint} />
+              ))
+            )}
+          </Row>
+        </Container>
       </div>
+
       <ToastContainer theme="dark" limit={3} />
     </>
   );

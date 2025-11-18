@@ -38,7 +38,7 @@ var redisClient;
 const startServer = async () => {
   const redisConfig = {
     host: process.env.REDIS_HOST,
-    port: 13305,
+    port: 11556,
     password: process.env.REDIS_PASSWORD, 
   };
   redisClient = new Redis(redisConfig);

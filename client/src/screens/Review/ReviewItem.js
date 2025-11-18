@@ -40,7 +40,7 @@ const ReviewItem = (props) => {
       thid,
       created_at: hintDetails.created_at,
     };
-    const res = await axios.post(`${BACKEND_URL}/review/`, data);
+    const res = await axios.post(`${BACKEND_URL}/review/approve/${thid}`, data);
     if (res.status === 200) {
       toast.success("Hint approved");
     } else {
@@ -48,7 +48,7 @@ const ReviewItem = (props) => {
     }
   };
   const handleReject = async (thid) => {
-    const res = await axios.delete(`${BACKEND_URL}/review/${thid}`);
+    const res = await axios.delete(`${BACKEND_URL}/review/reject/${thid}`);
     if (res.status === 200) {
       toast.success("Hint rejected");
     } else {
